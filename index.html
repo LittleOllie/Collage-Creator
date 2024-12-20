@@ -18,31 +18,32 @@
 <body>
   <h1>NFT Collage Viewer</h1>
   <input type="text" id="walletAddress" placeholder="Enter wallet address" />
-  <input type="text" id="collectionSlug" placeholder="Enter collection slug" />
+  <input type="text" id="collectionURL" placeholder="Enter OpenSea collection URL" />
   <button id="viewCollageButton">View Collage</button>
   <div id="loading">Loading NFTs...</div>
   <div id="collage"></div>
 
   <script>
-    const apiKey = 'YourOpenSeaAPIKey';
     const viewCollageButton = document.getElementById('viewCollageButton');
     const loading = document.getElementById('loading');
     const collage = document.getElementById('collage');
 
-    async function fetchNFTs(walletAddress, collectionSlug) {
+    async function fetchNFTs(walletAddress, collectionURL) {
       loading.style.display = 'block';
       collage.innerHTML = '';
 
+      // Extract collection slug from the URL
+      const collectionSlug = collectionURL.split('/').pop();
+      if (!collectionSlug) {
+        alert('Invalid collection URL. Please enter a valid OpenSea collection link.');
+        loading.style.display = 'none';
+        return;
+      }
+
       const apiUrl = `https://api.opensea.io/api/v1/assets?owner=${walletAddress}&collection=${collectionSlug}&order_direction=desc&offset=0&limit=50`;
 
-      const options = {
-        headers: {
-          'X-API-KEY': apiKey,
-        },
-      };
-
       try {
-        const response = await fetch(apiUrl, options);
+        const response = await fetch(apiUrl);
         const data = await response.json();
         const nfts = data.assets;
 
@@ -68,19 +69,19 @@
 
     viewCollageButton.addEventListener('click', () => {
       const walletAddress = document.getElementById('walletAddress').value.trim();
-      const collectionSlug = document.getElementById('collectionSlug').value.trim();
+      const collectionURL = document.getElementById('collectionURL').value.trim();
 
       if (!walletAddress) {
         alert('Please enter a wallet address.');
         return;
       }
 
-      if (!collectionSlug) {
-        alert('Please enter a collection slug.');
+      if (!collectionURL) {
+        alert('Please enter a collection URL.');
         return;
       }
 
-      fetchNFTs(walletAddress, collectionSlug);
+      fetchNFTs(walletAddress, collectionURL);
     });
   </script>
 </body>
