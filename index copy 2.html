@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFT Collage Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    #collage {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .nft {
+      width: 150px;
+      height: 150px;
+      overflow: hidden;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .nft img {
+      width: 100%;
+      height: auto;
+    }
+    #loading {
+      display: none;
+      font-size: 1.2em;
+      color: #888;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>NFT Collage Viewer</h1>
+  <input type="text" id="walletAddress" placeholder="Enter wallet address" />
+  <input type="text" id="collectionSlug" placeholder="Enter collection slug" />
+  <button id="viewCollageButton">View Collage</button>
+  <div id="loading">Loading NFTs...</div>
+  <div id="collage"></div>
+
+  <script>
+    const viewCollageButton = document.getElementById('viewCollageButton');
+    const loading = document.getElementById('loading');
+    const collage = document.getElementById('collage');
+
+    async function fetchNFTs(walletAddress, collectionSlug) {
+      loading.style.display = 'block';
+      collage.innerHTML = '';
+
+      const apiUrl = `https://api.opensea.io/api/v1/assets?owner=${walletAddress}&collection=${collectionSlug}&order_direction=desc&offset=0&limit=50`;
+
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const nfts = data.assets;
+
+        if (!nfts || nfts.length === 0) {
+          alert('No NFTs found in this collection for this wallet.');
+          return;
+        }
+
+        nfts.forEach((nft) => {
+          const imgSrc = nft.image_url || nft.image_preview_url;
+          const nftDiv = document.createElement('div');
+          nftDiv.className = 'nft';
+          nftDiv.innerHTML = `<img src="${imgSrc}" alt="${nft.name}" />`;
+          collage.appendChild(nftDiv);
+        });
+      } catch (err) {
+        console.error('Error fetching NFTs:', err);
+        alert('Error fetching NFTs. Please try again.');
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    viewCollageButton.addEventListener('click', () => {
+      const walletAddress = document.getElementById('walletAddress').value.trim();
+      const collectionSlug = document.getElementById('collectionSlug').value.trim();
+
+      if (!walletAddress) {
+        alert('Please enter a wallet address.');
+        return;
+      }
+
+      if (!collectionSlug) {
+        alert('Please enter a collection slug.');
+        return;
+      }
+
+      fetchNFTs(walletAddress, collectionSlug);
+    });
+  </script>
+</body>
+</html>
