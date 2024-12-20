@@ -5,61 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NFT Collage Viewer</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-      background-color: #f9f9f9;
-    }
-    h1 {
-      color: #333;
-    }
-    #collage {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .nft {
-      width: 150px;
-      height: 150px;
-      overflow: hidden;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .nft img {
-      width: 100%;
-      height: auto;
-    }
-    #loading {
-      display: none;
-      font-size: 1.2em;
-      color: #888;
-    }
-    input {
-      padding: 10px;
-      margin: 10px;
-      width: 300px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background-color: #f9f9f9; }
+    #collage { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+    .nft { width: 150px; height: 150px; overflow: hidden; border: 2px solid #ccc; border-radius: 8px; background-color: #fff; }
+    .nft img { width: 100%; height: auto; }
+    #loading { display: none; font-size: 1.2em; color: #888; }
+    input, button { padding: 10px; margin: 10px; width: 300px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+    button { background-color: #007bff; color: #fff; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
   </style>
 </head>
 <body>
@@ -71,6 +24,7 @@
   <div id="collage"></div>
 
   <script>
+    const apiKey = 'YourOpenSeaAPIKey';
     const viewCollageButton = document.getElementById('viewCollageButton');
     const loading = document.getElementById('loading');
     const collage = document.getElementById('collage');
@@ -81,8 +35,14 @@
 
       const apiUrl = `https://api.opensea.io/api/v1/assets?owner=${walletAddress}&collection=${collectionSlug}&order_direction=desc&offset=0&limit=50`;
 
+      const options = {
+        headers: {
+          'X-API-KEY': apiKey,
+        },
+      };
+
       try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, options);
         const data = await response.json();
         const nfts = data.assets;
 
